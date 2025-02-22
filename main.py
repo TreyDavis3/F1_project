@@ -3,4 +3,4 @@ try:
         file_content = file.read()  # Read the entire file content
         print(file_content)
 except FileNotFoundError:
-    print("Error: File 'my_data.txt' not found.")
+    print("Error: File 'GP_winners.txt' not found.")
