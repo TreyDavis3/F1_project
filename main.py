@@ -15,15 +15,33 @@ def read_csv_file(filepath):
         return None
     return data
 
-def __main__():
+def find_race():
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
     if data:
         country = input("Enter the country name: ")
         for row in data:
             if (country.lower() in row[0].lower()):
-                print(f"{row[0]}: {row[1]} - {row[2]}")
-        print("Done")
+                print(f"{row[0]}: {row[1]} - {row[2]} - {row[3]}")
+
+def find_driver_car():
+    filepath = 'GP_winners.txt'
+    data = read_csv_file(filepath)
+    if data:
+        driver = input("Enter driver name: ")
+        single_driver = set()
+        for row in data:
+            if (driver.lower () in row[2].lower()):
+                driver_info = f"Car: {row[3]}, Date of Win: {row[1]}"
+                single_driver.add(driver_info)
+        for driver_results in single_driver:
+            print(driver)
+            print(driver_results)
+
+def __main__():
+    find_driver_car()
+    #find_race()
+    print("Done")
 
 
 if __name__ == "__main__":
