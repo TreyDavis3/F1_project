@@ -30,17 +30,17 @@ def find_driver_car():
     if data:
         driver = input("Enter driver name: ")
         single_driver = set()
+        print(driver)
         for row in data:
-            if (driver.lower () in row[2].lower()):
+            if (driver.lower() in row[2].lower()):
                 driver_info = f"Car: {row[3]}, Date of Win: {row[1]}"
                 single_driver.add(driver_info)
         for driver_results in single_driver:
-            print(driver)
             print(driver_results)
 
 def __main__():
     find_driver_car()
-    #find_race()
+    find_race()
     print("Done")
 
 
