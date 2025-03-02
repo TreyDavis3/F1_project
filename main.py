@@ -38,9 +38,24 @@ def find_driver_car():
         for driver_results in single_driver:
             print(driver_results)
 
+def find_car_driver():
+    filepath = 'GP_winners.txt'
+    data = read_csv_file(filepath)
+    if data:
+        car = input("Enter a Constructor: ")
+        constructor = set()
+        print(car)
+        for row in data:
+            if(car.lower() in row[3].lower()):
+                car_info = f"Driver: {row[2]}" #TODO add total number of wins for each driver
+                constructor.add(car_info)
+        for car_drivers in constructor:
+            print(car_drivers)
+
 def __main__():
-    find_driver_car()
-    find_race()
+    find_car_driver()
+    #find_driver_car()
+    #find_race()
     print("Done")
 
 
