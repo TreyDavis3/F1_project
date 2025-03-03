@@ -49,6 +49,11 @@ def find_car_driver():
             if(car.lower() in row[3].lower()):
                 car_info = f"Driver: {row[2]}" #TODO add total number of wins for each driver
                 constructor.add(car_info)
+        total_wins = 0
+        for row in data:
+            if(car.lower() in row[3].lower()):
+                total_wins += 1
+        print(f"Total wins for {car}: {total_wins}")
         for car_drivers in constructor:
             print(car_drivers)
 
