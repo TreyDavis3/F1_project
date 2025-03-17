@@ -25,6 +25,8 @@ def find_race():
                 print(f"{row[0]}: {row[1]} - {row[2]} - {row[3]}")
 
 def find_driver_car():
+    #TODO figure out why it is only printing the driver name and not the car
+    #TODO add total number of wins for each driver
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
     if data:
@@ -35,8 +37,14 @@ def find_driver_car():
             if (driver.lower() in row[2].lower()):
                 driver_info = f"Car: {row[3]}, Date of Win: {row[1]}"
                 single_driver.add(driver_info)
-        for driver_results in single_driver:
-            print(driver_results)
+    total_wins = 0
+    for row in data:
+        if(driver.lower() in row[3].lower()):
+            total_wins += 1
+        driver_wins = f"Total wins for {driver}: {total_wins}"
+        single_driver.add(driver_wins)
+    for driver_results in single_driver:
+        print(driver_results)
 
 def find_car_driver():
     filepath = 'GP_winners.txt'
@@ -58,8 +66,8 @@ def find_car_driver():
             print(car_drivers)
 
 def __main__():
-    find_car_driver()
-    #find_driver_car()
+    #find_car_driver()
+    find_driver_car()
     #find_race()
     print("Done")
 
