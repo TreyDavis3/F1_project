@@ -26,7 +26,6 @@ def find_race():
 
 def find_driver_car():
     #TODO figure out why it is only printing the driver name and not the car
-    #TODO add total number of wins for each driver(Mostly done, check formatting and flow of program)
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
     if data:
@@ -39,11 +38,11 @@ def find_driver_car():
                 single_driver.add(driver_info)
     total_wins = 0
     for row in data:
-        if(driver.lower() in row[3].lower()):
+        if(driver.lower() in row[2].lower()):
             total_wins += 1
-        driver_wins = f"Total wins for {driver}: {total_wins}"
-        single_driver.add(driver_wins)
-        #TODO fix the formatting for the total wins and have it print total once at the top
+    driver_wins = f"Total wins for {driver}: {total_wins}"
+    print(driver_wins)
+    
     for driver_results in single_driver:
         print(driver_results)
 
