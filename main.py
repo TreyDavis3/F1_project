@@ -16,20 +16,29 @@ def read_csv_file(filepath):
         return None
     return data
 
-def Number_of_Wins(driver):
+def Number_of_Wins(driver_name_query):
     # This function counts the number of wins for a given driver
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
-    if data is None:
-        print("No data found to count wins.")
+    if data is None or len(data) <= 1: # Check for no data or only header
+        # print("No data or only header found to count wins.") # Optional: more specific message
         return 0
-    driver = driver.lower() in row[2].lower() # This will be used to check if the driver name matches in the data
+
+    # The first row is the header, skip it for data processing.
+    actual_data = data[1:]
+    search_name_lower = driver_name_query.strip().lower()
     total_wins = 0
-    for row in data:
-        if(driver.lower() in row[2].lower()):
-            total_wins += 1
+
+    for row in actual_data:
+        if len(row) > 2: # Ensure 'Winner' column (index 2) exists
+            winner_in_row = row[2].strip().lower()
+            if search_name_lower in winner_in_row: # Check if the queried driver is part of the winner's name
+                total_wins += 1
+        # else:
+            # print(f"Warning: Row with insufficient columns in Number_of_Wins: {row}") # Optional
     return total_wins
     # This function returns the total number of wins for a given driver
+
 
 def find_race():
     filepath = 'GP_winners.txt'
@@ -106,25 +115,50 @@ def find_driver_car():
 def find_car_driver():
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
-    if data:
-        car = input("Enter a Constructor: ")
-        constructor = set()
-        print(car)
-        for row in data:
-            if(car.lower() in row[3].lower()):
-                car_info = f"Driver: {row[2]}, Total Wins: {Number_of_Wins}" #TODO add total number of wins for each driver
-                constructor.add(car_info)
-        car_wins = 0
-        for row in data:
-            if(car.lower() in row[3].lower()):
-                car_wins += 1
-        print(f"Total wins for {car}: {car_wins}")
-        for car_drivers in constructor:
-            print(car_drivers)
+
+    if not data or len(data) <= 1: # No data or only header
+        print("No race data available from GP_winners.txt.")
+        return
+
+    car_query_input = input("Enter a Constructor: ").strip()
+    if not car_query_input:
+        print("No constructor name entered.")
+        return
+
+    car_query_lower = car_query_input.lower()
+    
+    # Using a dictionary to store drivers and their total wins to avoid redundant calls
+    # and to easily sort/present later.
+    # Key: driver name (original casing), Value: their total career wins
+    drivers_for_constructor = {}
+    constructor_total_wins = 0
+    
+    actual_data = data[1:] # Skip header row
+
+    for row in actual_data:
+        if len(row) > 3: # Need at least Grand Prix, Date, Winner, Car
+            car_in_row = row[3].strip().lower()
+            driver_name_from_file = row[2].strip()
+
+            if car_query_lower in car_in_row:
+                constructor_total_wins += 1
+                if driver_name_from_file not in drivers_for_constructor:
+                    drivers_for_constructor[driver_name_from_file] = Number_of_Wins(driver_name_from_file)
+
+    print(f"\nTotal wins for constructor '{car_query_input.title()}': {constructor_total_wins}")
+    if drivers_for_constructor:
+        print(f"\nDrivers who won for '{car_query_input.title()}' (and their total career F1 wins):")
+        print("---------------------------------------------------------------------")
+        # Sort drivers alphabetically for consistent output
+        for driver_name in sorted(drivers_for_constructor.keys()):
+            print(f"Driver: {driver_name}, Total Career Wins: {drivers_for_constructor[driver_name]}")
+        print("---------------------------------------------------------------------")
+    else:
+        print(f"No drivers found who won for constructor '{car_query_input.title()}'.")
 
 def __main__():
-    #find_car_driver()
-    find_driver_car()
+    find_car_driver()
+    #find_driver_car()
     #find_race()
     print("Done")
 
