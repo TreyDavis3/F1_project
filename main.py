@@ -1,4 +1,5 @@
 import csv, os
+from datetime import datetime
 
 def read_csv_file(filepath):
     data = []
@@ -15,6 +16,21 @@ def read_csv_file(filepath):
         return None
     return data
 
+def Number_of_Wins(driver):
+    # This function counts the number of wins for a given driver
+    filepath = 'GP_winners.txt'
+    data = read_csv_file(filepath)
+    if data is None:
+        print("No data found to count wins.")
+        return 0
+    driver = driver.lower() in row[2].lower() # This will be used to check if the driver name matches in the data
+    total_wins = 0
+    for row in data:
+        if(driver.lower() in row[2].lower()):
+            total_wins += 1
+    return total_wins
+    # This function returns the total number of wins for a given driver
+
 def find_race():
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
@@ -25,26 +41,67 @@ def find_race():
                 print(f"{row[0]}: {row[1]} - {row[2]} - {row[3]}")
 
 def find_driver_car():
-    #TODO figure out why it is only printing the driver name and not the car
+    #TODO Possibly add a check to see if the driver has won in multiple cars and print each instance
+
+    # Define the expected date format in your GP_winners.txt file.
+    # Example: '%Y-%m-%d' for dates like '2023-03-05'.
+    # Adjust this format string if your dates are different (e.g., '%d/%m/%Y' for '05/03/2023').
+    DATE_FORMAT = '%Y-%m-%d'
+
     filepath = 'GP_winners.txt'
     data = read_csv_file(filepath)
-    if data:
-        driver = input("Enter driver name: ")
-        single_driver = set()
-        print(driver)
-        for row in data:
-            if (driver.lower() in row[2].lower()):
-                driver_info = f"Car: {row[3]}, Date of Win: {row[1]}"
-                single_driver.add(driver_info)
-    total_wins = 0
-    for row in data:
-        if(driver.lower() in row[2].lower()):
-            total_wins += 1
-    driver_wins = f"Total wins for {driver}: {total_wins}"
-    print(driver_wins)
-    
-    for driver_results in single_driver:
-        print(driver_results)
+
+    if not data:
+        print("No data available from GP_winners.txt.")
+        return
+
+    driver_name_query = input("Enter driver name: ").strip().lower()
+    if not driver_name_query:
+        print("No driver name entered.")
+        return
+
+    driver_wins_list = []
+
+    for row_index, row in enumerate(data):
+        # Expecting at least 4 columns: Country/Event, Date, Driver, Car
+        if len(row) < 4:
+            # print(f"Warning: Row {row_index + 1} is malformed or has too few columns: {row}")
+            continue
+
+        race_date_str = row[1]
+        driver_in_row = row[2].lower()
+        car_in_row = row[3]
+        original_driver_name_from_file = row[2] # Keep original casing for display
+
+        if driver_name_query in driver_in_row:
+            parsed_date_obj = None
+            try:
+                parsed_date_obj = datetime.strptime(race_date_str, DATE_FORMAT)
+            except ValueError:
+                print(f"Warning: Date '{race_date_str}' for driver '{original_driver_name_from_file}' (Car: {car_in_row}) "
+                      f"could not be parsed with format '{DATE_FORMAT}'. This win may not be sorted chronologically.")
+            
+            driver_wins_list.append({
+                'parsed_date_obj': parsed_date_obj, # This will be None if parsing failed
+                'date_str': race_date_str,          # Original date string for display
+                'car': car_in_row,
+                'driver_name_from_file': original_driver_name_from_file
+            })
+
+    if not driver_wins_list:
+        print(f"No wins found for a driver matching '{driver_name_query.title()}'.")
+        return
+
+    # Sort the list: wins with parseable dates first (oldest to newest), then unparseable dates (sorted by their string representation).
+    driver_wins_list.sort(key=lambda win: (win['parsed_date_obj'] is None, win['parsed_date_obj'] if win['parsed_date_obj'] else win['date_str']))
+
+    print(f"\nTotal wins for drivers matching '{driver_name_query.title()}': {len(driver_wins_list)}")
+    if driver_wins_list:
+        print("Wins are listed from oldest to newest (unparseable dates, if any, are listed after chronological wins):")
+        print("----------------------------------------------------")
+        for win in driver_wins_list:
+            print(f"Driver: {win['driver_name_from_file']}, Car: {win['car']}, Date of Win: {win['date_str']}")
+        print("----------------------------------------------------")
 
 def find_car_driver():
     filepath = 'GP_winners.txt'
@@ -55,13 +112,13 @@ def find_car_driver():
         print(car)
         for row in data:
             if(car.lower() in row[3].lower()):
-                car_info = f"Driver: {row[2]}" #TODO add total number of wins for each driver
+                car_info = f"Driver: {row[2]}, Total Wins: {Number_of_Wins}" #TODO add total number of wins for each driver
                 constructor.add(car_info)
-        total_wins = 0
+        car_wins = 0
         for row in data:
             if(car.lower() in row[3].lower()):
-                total_wins += 1
-        print(f"Total wins for {car}: {total_wins}")
+                car_wins += 1
+        print(f"Total wins for {car}: {car_wins}")
         for car_drivers in constructor:
             print(car_drivers)
 
